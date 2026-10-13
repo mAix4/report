@@ -71,21 +71,16 @@
             .data-grid { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 0.4rem !important; }
             .col-span-4 { grid-column: span 4 / span 4 !important; }
             
-            /* إجبار الصور على الظهور بارتفاع ثابت ومباشر في الطباعة */
-            .image-container { 
-                height: 42mm !important; 
-                display: flex !important;
-                page-break-inside: avoid !important;
-                border: 1px solid #e5e7eb !important;
-                margin-bottom: 0 !important;
-                align-items: center !important;
-                justify-content: center !important;
+            /* تخصيص حاويات الشواهد الديناميكية للطباعة */
+            .dynamic-evidence-container {
+                display: grid !important;
+                gap: 8px !important;
             }
-            .image-container img {
-                display: block !important;
-                width: 100% !important;
-                height: 100% !important;
-                object-fit: cover !important;
+            .evidence-print-item {
+                border: 1px solid #e5e7eb !important;
+                border-radius: 8px !important;
+                overflow: hidden !important;
+                page-break-inside: avoid !important;
             }
         }
 
@@ -111,8 +106,8 @@
             <div class="space-y-4">
                 <!-- رفع الشعار -->
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">شعار الجهة / وزارة التعليم</label>
-                    <input type="file" accept="image/*" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-150 cursor-pointer" onchange="previewLogo(this)">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">شعار الجهة (اختياري)</label>
+                    <input type="file" accept="image/*" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" onchange="previewLogo(this)">
                 </div>
 
                 <div>
@@ -166,11 +161,11 @@
 
             <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mt-4">
                 <h3 class="text-sm font-bold text-blue-900 mb-3">إرفاق الشواهد (الصور)</h3>
-                <p class="text-xs text-gray-500 mb-2">اضغط على المربع لاختيار حتى 4 صور دفعة واحدة.</p>
+                <p class="text-xs text-gray-500 mb-2">اضغط واختر الصور دفعة واحدة (حتى 4 صور)، ستظهر حسب العدد المرفق تلقائياً.</p>
                 <div class="relative bg-white border-2 border-dashed border-blue-300 rounded-lg p-6 text-center hover:bg-blue-100 transition overflow-hidden flex flex-col items-center justify-center cursor-pointer min-h-[120px]">
                     <input type="file" accept="image/*" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="previewMultipleImages(this)">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    <span class="text-sm font-semibold text-blue-700">اضغط هنا واختَر 4 صور معاً</span>
+                    <span class="text-sm font-semibold text-blue-700">اضغط هنا لاختيار الشواهد (صور)</span>
                     <span id="upload-status" class="text-xs text-gray-500 mt-2">لم يتم اختيار صور</span>
                 </div>
             </div>
@@ -194,10 +189,10 @@
                         <p id="out-school">مركز الموهوبين بالقصيم</p>
                     </div>
                     
-                    <!-- الشعار المرفوع في المنتصف -->
+                    <!-- شعار الجهة في المنتصف -->
                     <div class="text-center w-1/3 flex justify-center items-center">
                          <img id="out-logo" class="logo-preview hidden" alt="شعار الجهة">
-                         <span id="logo-placeholder" class="text-xs text-gray-300 font-medium">مكان الشعار</span>
+                         <span id="logo-placeholder" class="text-xs text-gray-300 font-medium">الشعار</span>
                     </div>
 
                     <div class="text-left w-1/3"></div>
@@ -254,29 +249,16 @@
                     </ol>
                 </div>
 
-                <!-- الشواهد (الصور) -->
+                <!-- الشواهد (تظهر ديناميكياً حسب عدد الصور المرفوعة) -->
                 <div class="mt-2 flex-grow">
                     <h3 class="font-bold mb-3 text-base flex items-center gap-2 text-blue-900">
                         <span class="w-1.5 h-5 bg-blue-700 rounded-full inline-block"></span>
                         الشواهد:
                     </h3>
                     
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="image-container border-2 border-gray-200 bg-gray-50 rounded-xl overflow-hidden shadow-sm h-44 flex items-center justify-center relative">
-                            <span id="out-pl-1" class="text-gray-400 text-xs font-semibold">الشاهد 1</span>
-                            <img id="out-img-1" class="w-full h-full object-cover hidden">
-                        </div>
-                        <div class="image-container border-2 border-gray-200 bg-gray-50 rounded-xl overflow-hidden shadow-sm h-44 flex items-center justify-center relative">
-                            <span id="out-pl-2" class="text-gray-400 text-xs font-semibold">الشاهد 2</span>
-                            <img id="out-img-2" class="w-full h-full object-cover hidden">
-                        </div>
-                        <div class="image-container border-2 border-gray-200 bg-gray-50 rounded-xl overflow-hidden shadow-sm h-44 flex items-center justify-center relative">
-                            <span id="out-pl-3" class="text-gray-400 text-xs font-semibold">الشاهد 3</span>
-                            <img id="out-img-3" class="w-full h-full object-cover hidden">
-                        </div>
-                        <div class="image-container border-2 border-gray-200 bg-gray-50 rounded-xl overflow-hidden shadow-sm h-44 flex items-center justify-center relative">
-                            <span id="out-pl-4" class="text-gray-400 text-xs font-semibold">الشاهد 4</span>
-                            <img id="out-img-4" class="w-full h-full object-cover hidden">
+                    <div id="evidence-container" class="grid grid-cols-1 gap-3">
+                        <div class="text-center py-6 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-xs">
+                            لم يتم إرفاق شواهد بعد. ارفع الصور من لوحة التحكم لتظهر هنا تلقائياً.
                         </div>
                     </div>
                 </div>
@@ -286,7 +268,7 @@
     </div>
 
     <script>
-        // دالة ربط البيانات المباشرة النصوص العادية
+        // ربط النصوص المباشرة
         function bindText(inputId, outputId) {
             const input = document.getElementById(inputId);
             const output = document.getElementById(outputId);
@@ -314,7 +296,7 @@
             }
         });
 
-        // معالجة الأهداف لعمل قائمة
+        // معالجة الأهداف
         const inpGoals = document.getElementById('inp-goals');
         const outGoals = document.getElementById('out-goals');
         inpGoals.addEventListener('input', (e) => {
@@ -322,7 +304,7 @@
             outGoals.innerHTML = lines.map(line => `<li>${line}</li>`).join('');
         });
 
-        // دالة رفع وعرض شعار الجهة
+        // رفع شعار الجهة
         function previewLogo(inputElement) {
             if (inputElement.files && inputElement.files[0]) {
                 const reader = new FileReader();
@@ -337,45 +319,53 @@
             }
         }
 
-        // دالة رفع وتوزيع 4 صور دفعة واحدة للشواهد
+        // دالة رفع وعرض الشواهد ديناميكياً حسب العدد المرفق
         function previewMultipleImages(inputElement) {
             const files = inputElement.files;
             const statusText = document.getElementById('upload-status');
+            const container = document.getElementById('evidence-container');
             
             if (files.length > 0) {
-                statusText.innerText = `تم اختيار ${Math.min(files.length, 4)} صور بنجاح`;
+                statusText.innerText = `تم اختيار ${files.length} صور بنجاح`;
                 statusText.classList.replace('text-gray-500', 'text-green-600');
                 statusText.classList.add('font-bold');
             } else {
                 statusText.innerText = 'لم يتم اختيار صور';
                 statusText.classList.replace('text-green-600', 'text-gray-500');
                 statusText.classList.remove('font-bold');
+                container.innerHTML = `<div class="text-center py-6 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-xs">لم يتم إرفاق شواهد بعد. ارفع الصور من لوحة التحكم لتظهر هنا تلقائياً.</div>`;
+                return;
             }
 
-            // المرور على الصور وتوزيعها على المربعات الأربعة
-            for (let i = 0; i < 4; i++) {
-                const imgId = `out-img-${i + 1}`;
-                const placeholderId = `out-pl-${i + 1}`;
-                const imgElement = document.getElementById(imgId);
-                const placeholderElement = document.getElementById(placeholderId);
-                
-                if (i < files.length) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        imgElement.src = e.target.result;
-                        imgElement.classList.remove('hidden');
-                        if (placeholderElement) placeholderElement.classList.add('hidden');
-                    }
-                    reader.readAsDataURL(files[i]);
-                } else {
-                    imgElement.src = '';
-                    imgElement.classList.add('hidden');
-                    if (placeholderElement) placeholderElement.classList.remove('hidden');
-                }
+            // تفريغ الحاوية
+            container.innerHTML = '';
+            
+            // تحديد تنسيق الشبكة بناءً على عدد الصور المرفوعة لتوزيعها بشكل أنيق
+            let gridColsClass = 'grid-cols-1';
+            let imageHeight = 'h-48';
+            if (files.length === 2) {
+                gridColsClass = 'grid-cols-2';
+                imageHeight = 'h-44';
+            } else if (files.length >= 3) {
+                gridColsClass = 'grid-cols-2';
+                imageHeight = 'h-40';
             }
+            container.className = `grid ${gridColsClass} gap-3`;
+
+            // قراءة كل صورة وعرضها فوراً كعنصر مستقل
+            Array.from(files).slice(0, 4).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = `border-2 border-gray-200 bg-gray-50 rounded-xl overflow-hidden shadow-sm ${imageHeight} flex items-center justify-center relative evidence-print-item`;
+                    itemDiv.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover" alt="شاهد ${index + 1}">`;
+                    container.appendChild(itemDiv);
+                }
+                reader.readAsDataURL(file);
+            });
         }
 
-        // دالة الطباعة وتغيير اسم الملف تلقائياً ليطابق اسم البرنامج
+        // دالة الطباعة مع تخصيص اسم الملف الافتراضي باسم البرنامج
         function printReport() {
             const originalTitle = document.title;
             const programName = document.getElementById('inp-program').value || 'تقرير البرنامج';
